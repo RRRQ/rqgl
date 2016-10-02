@@ -17,6 +17,11 @@ rqGL.prototype.clear = function()
 }
 
 // シェーダーコンパイル
+rqGL.prototype.compileVertexShaderById = function( id )
+{
+	var elem = document.getElementById(id);
+	return this.compileVertexShader( elem.text );
+}
 rqGL.prototype.compileVertexShader = function( text )
 {
     var shader = rqGL.GLContext.createShader( rqGL.GLContext.VERTEX_SHADER );
@@ -31,6 +36,11 @@ rqGL.prototype.compileVertexShader = function( text )
 }
 
 // シェーダーコンパイル
+rqGL.prototype.compileFragmentShaderById = function( id )
+{
+	var elem = document.getElementById(id);
+	return this.compileFragmentShader( elem.text );
+}
 rqGL.prototype.compileFragmentShader = function( text )
 {
     var shader = rqGL.GLContext.createShader( rqGL.GLContext.FRAGMENT_SHADER );
@@ -74,7 +84,7 @@ rqGL.prototype.createIndexBuffer = function( data )
     return ib;
 }
 
-// 頂点宣言 定数
+// 定数
 rqGL.prototype.ELEM_POSITION = 0;
 rqGL.prototype.ELEM_NORMAL   = 1;
 rqGL.prototype.ELEM_COLOR    = 2;
@@ -91,6 +101,9 @@ rqGL.prototype.UNIFORMTYPE_FLOAT3 = function( ctx, loc, val ) { ctx.uniform3fv( 
 rqGL.prototype.UNIFORMTYPE_FLOAT4 = function( ctx, loc, val ) { ctx.uniform4fv( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_MATRIX33 = function( ctx, loc, val ) { ctx.uniformMatrix3fv( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_MATRIX44 = function( ctx, loc, val ) { ctx.uniformMatrix4fv( loc, val ); };
+
+rqGL.prototype.PRIMITIVETYPE_TRIANGLES = 0;
+rqGL.prototype.PRIMITIVETYPE_TRIANGLE_STRIP = 1;
 
 // 頂点宣言クラス
 rqGL.prototype.InputLayout = function()
@@ -143,8 +156,9 @@ rqGL.prototype.ShaderProgram.prototype.addUniform = function( name, type )
 }
 
 // バッチクラス
-rqGL.prototype.Batch = function( vb, ib, shader, inputlayout, vertexcount )
+rqGL.prototype.Batch = function( primitivetype, vb, ib, shader, inputlayout, vertexcount )
 {
+    this.PrimitiveType = primitivetype;
     this.VertexCount = vertexcount;
     this.VertexBuffer = vb;
     this.IndexBuffer = ib;
@@ -159,9 +173,9 @@ rqGL.prototype.Batch = function( vb, ib, shader, inputlayout, vertexcount )
 };
 
 // バッチクラス：作成
-rqGL.prototype.createBatch = function( vb, ib, shader, inputlayout, vertexcount )
+rqGL.prototype.createBatch = function( primitivetype, vb, ib, shader, inputlayout, vertexcount )
 {
-    return new rqGL.prototype.Batch( vb, ib, shader, inputlayout, vertexcount );
+    return new rqGL.prototype.Batch( primitivetype, vb, ib, shader, inputlayout, vertexcount );
 };
 
 // バッチクラス：事前処理
@@ -171,6 +185,17 @@ rqGL.prototype.Batch.prototype.precompute = function()
     this.Stride = 0;
 
     var ctx = rqGL.GLContext;
+
+    switch( this.PrimitiveType )
+    {
+	case rqGL.prototype.PRIMITIVETYPE_TRIANGLES:
+        this.NativePrimitiveType =  ctx.TRIANGLES;
+        break;
+	case rqGL.prototype.PRIMITIVETYPE_TRIANGLE_STRIP:
+        this.NativePrimitiveType =  ctx.TRIANGLE_STRIP;
+        break;
+    }
+
     var il = this.InputLayout.Layout;
 
     var counter = [];
@@ -253,11 +278,19 @@ rqGL.prototype.Batch.prototype.draw = function()
         }
     }
 
-    ctx.drawElements( ctx.TRIANGLES, this.VertexCount, ctx.UNSIGNED_SHORT, 0 );
+    ctx.drawElements( this.NativePrimitiveType, this.VertexCount, ctx.UNSIGNED_SHORT, 0 );
 
     for( var i = 0; i < this.NativeInputLayout.length; ++i )
     {
         var nil = this.NativeInputLayout[i];
         ctx.disableVertexAttribArray( nil.Attribute );
     }
+}
+
+// debug
+function debugprint( text )
+{
+    var elem = document.createElement("div");
+    elem.innerHTML = text;
+    document.body.appendChild( elem );
 }
