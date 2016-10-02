@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>test</title>
-<script type="text/javascript" src="https://rrrq.github.io/rqgl/rqgl.js"></script>
+<script type="text/javascript" src="rqgl.js"></script>
 <script type="text/javascript">
 var rqgl;
 var batch;
@@ -11,21 +11,21 @@ onload = function()
 {
     rqgl = new rqGL( "display" );
 
-    var vs = rqgl.compileVertexShader( getText("vs") );
-    var fs = rqgl.compileFragmentShader( getText("fs") );
+    var vs = rqgl.compileVertexShaderById( "vs" );
+    var fs = rqgl.compileFragmentShaderById( "fs" );
     var shader = rqgl.createShaderProgram( vs, fs );
     shader.addUniform( "color", rqgl.UNIFORMTYPE_FLOAT3 );
 
-    var vertexdata = [ 0.0,0.6,0.0, 0.6,-0.5,0.0, -0.6,-0.5,0.0 ];
+    var vertexdata = [ -0.5,0.5,0.0, 0.5,0.5,0.0, -0.5,-0.5,0.0, 0.5,-0.5,0.0 ];
     var vb = rqgl.createVertexBuffer( vertexdata );
 
-    var indexdata = [ 0, 1, 2 ];
+    var indexdata = [ 0, 1, 2, 3 ];
     var ib = rqgl.createIndexBuffer( indexdata );
 
     var il = rqgl.createInputLayout();
     il.addElement( rqgl.ELEM_POSITION, rqgl.TYPE_FLOAT, 3 );
 
-    batch = rqgl.createBatch( vb, ib, shader, il, 3 );
+    batch = rqgl.createBatch( rqgl.PRIMITIVETYPE_TRIANGLE_STRIP, vb, ib, shader, il, 4 );
 
     requestAnimationFrame( main );
 }
@@ -39,16 +39,10 @@ function main()
 
     requestAnimationFrame( main );
 }
-
-function getText( id )
-{
-    var elem = document.getElementById( id );
-    return elem.text;
-}
 </script>
 <script id="vs" type="x-shader/x-vertex">
 attribute vec3 position;
-uniform   mat4 mvpMatrix;
+uniform mat4 mvpMatrix;
 void main(void)
 {
     //gl_Position = mvpMatrix * vec4(position, 1.0);
@@ -58,8 +52,14 @@ void main(void)
 <script id="fs" type="x-shader/x-fragment">
 precision mediump float;
 uniform vec3 color;
+uniform vec2 circles[16];
+
 void main(void)
 {
+    vec4 ret = vec4( 0.0, 0.0, 0.0, 0.0 );
+    for( int i = 0; i < 16; ++i )
+    {
+    }
     gl_FragColor = vec4(color, 1.0);
 }
 </script>

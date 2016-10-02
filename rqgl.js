@@ -101,6 +101,12 @@ rqGL.prototype.UNIFORMTYPE_FLOAT3 = function( ctx, loc, val ) { ctx.uniform3fv( 
 rqGL.prototype.UNIFORMTYPE_FLOAT4 = function( ctx, loc, val ) { ctx.uniform4fv( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_MATRIX33 = function( ctx, loc, val ) { ctx.uniformMatrix3fv( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_MATRIX44 = function( ctx, loc, val ) { ctx.uniformMatrix4fv( loc, val ); };
+rqGL.prototype.UNIFORMTYPE_FLOAT1_ARRAY = function( ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 1; ctx.uniform1f( loc+i, val[idx] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT2_ARRAY = function( ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 2; ctx.uniform2f( loc+i, val[idx+0], val[idx+1] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT3_ARRAY = function( ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 3; ctx.uniform3f( loc+i, val[idx+0], val[idx+1], val[idx+2] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT4_ARRAY = function( ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 4; ctx.uniform4f( loc+i, val[idx+0], val[idx+1], val[idx+2], val[idx+3] ); } };
+//rqGL.prototype.UNIFORMTYPE_MATRIX33_ARRAY = function( ctx, loc, val, siz ) { ctx.uniformMatrix3fv( loc, val ); };
+//rqGL.prototype.UNIFORMTYPE_MATRIX44_ARRAY = function( ctx, loc, val, siz ) { ctx.uniformMatrix4fv( loc, val ); };
 
 rqGL.prototype.PRIMITIVETYPE_TRIANGLES = 0;
 rqGL.prototype.PRIMITIVETYPE_TRIANGLE_STRIP = 1;
@@ -152,7 +158,13 @@ rqGL.prototype.createShaderProgram = function( vs, fs )
 rqGL.prototype.ShaderProgram.prototype.addUniform = function( name, type )
 {
     var loc = rqGL.GLContext.getUniformLocation( this.Program, name );
-    this.UniformInfo[name] = {Location:loc,Func:type};
+    this.UniformInfo[name] = {Location:loc,Func:type,Size:1};
+}
+// シェーダープログラム：シェーダー定数(配列)追加
+rqGL.prototype.ShaderProgram.prototype.addUniformArray = function( name, type, size )
+{
+    var loc = rqGL.GLContext.getUniformLocation( this.Program, name + "[0]" );
+    this.UniformInfo[name] = {Location:loc,Func:type,Size:size};
 }
 
 // バッチクラス
@@ -273,8 +285,7 @@ rqGL.prototype.Batch.prototype.draw = function()
         if( key in this.Shader.UniformInfo )
         {
             var ui = this.Shader.UniformInfo[key];
-            var loc = ui.Location;
-            ui.Func( ctx, loc, this.Uniform[key] );
+            ui.Func( ctx, ui.Location, this.Uniform[key], ui.Size );
         }
     }
 
