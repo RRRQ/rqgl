@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>test</title>
+<script type="text/javascript" src="rqgl.js"></script>
+<script type="text/javascript">
+var rqgl;
+var batch;
+
+onload = function()
+{
+    rqgl = new rqGL( "display" );
+
+    var vs = rqgl.compileVertexShader( getText("vs") );
+    var fs = rqgl.compileFragmentShader( getText("fs") );
+    var shader = rqgl.createShaderProgram( vs, fs );
+    shader.addUniform( "color", rqgl.UNIFORMTYPE_FLOAT3 );
+
+    var vertexdata = [ 0.0,0.6,0.0, 0.6,-0.5,0.0, -0.6,-0.5,0.0 ];
+    var vb = rqgl.createVertexBuffer( vertexdata );
+
+    var indexdata = [ 0, 1, 2 ];
+    var ib = rqgl.createIndexBuffer( indexdata );
+
+    var il = rqgl.createInputLayout();
+    il.addElement( rqgl.ELEM_POSITION, rqgl.TYPE_FLOAT, 3 );
+
+    batch = rqgl.createBatch( vb, ib, shader, il, 3 );
+
+    requestAnimationFrame( main );
+}
+
+function main()
+{
+    rqgl.clear();
+
+    batch.Uniform.color = [Math.random(),Math.random(),Math.random()];
+    batch.draw();
+
+    requestAnimationFrame( main );
+}
+
+function getText( id )
+{
+    var elem = document.getElementById( id );
+    return elem.text;
+}
+</script>
+<script id="vs" type="x-shader/x-vertex">
+attribute vec3 position;
+uniform   mat4 mvpMatrix;
+void main(void)
+{
+    //gl_Position = mvpMatrix * vec4(position, 1.0);
+    gl_Position = vec4(position, 1.0);
+}
+</script>
+<script id="fs" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec3 color;
+void main(void)
+{
+    gl_FragColor = vec4(color, 1.0);
+}
+</script>
+</head>
+<body>
+<canvas id="display" width=512 height=512></canvas>
+</body>
+</html>
