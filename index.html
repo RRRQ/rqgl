@@ -6,16 +6,19 @@
 <script type="text/javascript">
 var rqgl;
 var batch;
+var framebuffer;
 
 onload = function()
 {
     rqgl = new rqGL( "display" );
 
+    framebuffer = rqgl.createFrameBuffer( 512,512 );
+    
     var vs = rqgl.compileVertexShaderById( "vs" );
     var fs = rqgl.compileFragmentShaderById( "fs" );
     var shader = rqgl.createShaderProgram( vs, fs );
     shader.addUniform( "color", rqgl.UNIFORMTYPE_FLOAT3 );
-
+    shader.addUniform( "texture", rqgl.UNIFORMTYPE_TEXTURE );
     var vertexdata = [ -0.5,0.5,0.0, 0.5,0.5,0.0, -0.5,-0.5,0.0, 0.5,-0.5,0.0 ];
     var vb = rqgl.createVertexBuffer( vertexdata );
 
@@ -26,16 +29,27 @@ onload = function()
     il.addElement( rqgl.ELEM_POSITION, rqgl.TYPE_FLOAT, 3 );
 
     batch = rqgl.createBatch( rqgl.PRIMITIVETYPE_TRIANGLE_STRIP, vb, ib, shader, il, 4 );
-
+    
     requestAnimationFrame( main );
 }
 
 function main()
 {
+    rqgl.setFrameBuffer( framebuffer );
+    rqgl.setClearColor( 1, 0.6, 0, 1 );
     rqgl.clear();
 
     batch.Uniform.color = [Math.random(),Math.random(),Math.random()];
-    batch.draw();
+    batch.Uniform.texture = null;
+    rqgl.draw( batch );
+    
+    rqgl.setFrameBuffer( null );
+    rqgl.setClearColor( 0, 0.5, 1.0, 1 );
+    rqgl.clear();
+
+    batch.Uniform.color = [0,0,0];
+    batch.Uniform.texture = framebuffer.Color;
+    rqgl.draw( batch );
 
     requestAnimationFrame( main );
 }
@@ -54,13 +68,16 @@ precision mediump float;
 uniform vec3 color;
 uniform vec2 circles[16];
 
+uniform sampler2D texture;
+
 void main(void)
 {
-    vec4 ret = vec4( 0.0, 0.0, 0.0, 0.0 );
+    vec4 ret = texture2D( texture, vec2(0,0) );
     for( int i = 0; i < 16; ++i )
     {
     }
-    gl_FragColor = vec4(color, 1.0);
+    ret.xyz += color;
+    gl_FragColor = ret;
 }
 </script>
 </head>

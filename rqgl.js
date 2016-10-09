@@ -7,21 +7,30 @@ function rqGL( canvasid )
     ctx = canvas.getContext( "webgl" );
 
     rqGL.GLContext = ctx;
-}
+    
+    this.ClearColor = [0,0,0,1];
+};
 
 // クリア
 rqGL.prototype.clear = function()
 {
-    rqGL.GLContext.clearColor(0.0, 0.0, 0.0, 1.0);
+    rqGL.GLContext.clearColor( this.ClearColor[0], this.ClearColor[1], this.ClearColor[2], this.ClearColor[3]);
     rqGL.GLContext.clear( rqGL.GLContext.COLOR_BUFFER_BIT );
-}
+};
+rqGL.prototype.setClearColor = function( r,g,b,a )
+{
+    this.ClearColor[0] = r;
+    this.ClearColor[1] = g;
+    this.ClearColor[2] = b;
+    this.ClearColor[3] = a;
+};
 
 // シェーダーコンパイル
 rqGL.prototype.compileVertexShaderById = function( id )
 {
 	var elem = document.getElementById(id);
 	return this.compileVertexShader( elem.text );
-}
+};
 rqGL.prototype.compileVertexShader = function( text )
 {
     var shader = rqGL.GLContext.createShader( rqGL.GLContext.VERTEX_SHADER );
@@ -33,14 +42,14 @@ rqGL.prototype.compileVertexShader = function( text )
         alert( rqGL.GLContext.getShaderInfoLog(shader) );
     }
     return shader;
-}
+};
 
 // シェーダーコンパイル
 rqGL.prototype.compileFragmentShaderById = function( id )
 {
 	var elem = document.getElementById(id);
 	return this.compileFragmentShader( elem.text );
-}
+};
 rqGL.prototype.compileFragmentShader = function( text )
 {
     var shader = rqGL.GLContext.createShader( rqGL.GLContext.FRAGMENT_SHADER );
@@ -52,7 +61,7 @@ rqGL.prototype.compileFragmentShader = function( text )
         alert( rqGL.GLContext.getShaderInfoLog(shader) );
     }
     return shader;
-}
+};
 
 // 頂点バッファ作成
 rqGL.prototype.createVertexBuffer = function( data )
@@ -62,7 +71,7 @@ rqGL.prototype.createVertexBuffer = function( data )
     rqGL.GLContext.bufferData( rqGL.GLContext.ARRAY_BUFFER, new Float32Array(data), rqGL.GLContext.STATIC_DRAW );
     rqGL.GLContext.bindBuffer( rqGL.GLContext.ARRAY_BUFFER, null );
     return vb;
-}
+};
 
 // 頂点バッファ作成
 rqGL.prototype.createDynamicVertexBuffer = function( size )
@@ -72,7 +81,7 @@ rqGL.prototype.createDynamicVertexBuffer = function( size )
     rqGL.GLContext.bufferData( rqGL.GLContext.ARRAY_BUFFER, new Float32Array(size), rqGL.GLContext.DYNAMIC_DRAW );
     rqGL.GLContext.bindBuffer( rqGL.GLContext.ARRAY_BUFFER, null );
     return vb;
-}
+};
 
 // インデクスバッファ作成
 rqGL.prototype.createIndexBuffer = function( data )
@@ -82,7 +91,7 @@ rqGL.prototype.createIndexBuffer = function( data )
     rqGL.GLContext.bufferData( rqGL.GLContext.ELEMENT_ARRAY_BUFFER, new Int16Array(data), rqGL.GLContext.STATIC_DRAW );
     rqGL.GLContext.bindBuffer( rqGL.GLContext.ELEMENT_ARRAY_BUFFER, null );
     return ib;
-}
+};
 
 // 定数
 rqGL.prototype.ELEM_POSITION = 0;
@@ -95,18 +104,19 @@ rqGL.prototype.TYPE_FLOAT    = 0;
 rqGL.prototype.TYPE_UINT_N   = 1;
 rqGL.prototype.TYPE_USHORT_N = 2;
 
-rqGL.prototype.UNIFORMTYPE_FLOAT1 = function( ctx, loc, val ) { ctx.uniform1fv( loc, val ); };
-rqGL.prototype.UNIFORMTYPE_FLOAT2 = function( ctx, loc, val ) { ctx.uniform2fv( loc, val ); };
-rqGL.prototype.UNIFORMTYPE_FLOAT3 = function( ctx, loc, val ) { ctx.uniform3fv( loc, val ); };
-rqGL.prototype.UNIFORMTYPE_FLOAT4 = function( ctx, loc, val ) { ctx.uniform4fv( loc, val ); };
-rqGL.prototype.UNIFORMTYPE_MATRIX33 = function( ctx, loc, val ) { ctx.uniformMatrix3fv( loc, val ); };
-rqGL.prototype.UNIFORMTYPE_MATRIX44 = function( ctx, loc, val ) { ctx.uniformMatrix4fv( loc, val ); };
-rqGL.prototype.UNIFORMTYPE_FLOAT1_ARRAY = function( ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 1; ctx.uniform1f( loc+i, val[idx] ); } };
-rqGL.prototype.UNIFORMTYPE_FLOAT2_ARRAY = function( ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 2; ctx.uniform2f( loc+i, val[idx+0], val[idx+1] ); } };
-rqGL.prototype.UNIFORMTYPE_FLOAT3_ARRAY = function( ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 3; ctx.uniform3f( loc+i, val[idx+0], val[idx+1], val[idx+2] ); } };
-rqGL.prototype.UNIFORMTYPE_FLOAT4_ARRAY = function( ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 4; ctx.uniform4f( loc+i, val[idx+0], val[idx+1], val[idx+2], val[idx+3] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT1 = function( rqgl, ctx, loc, val ) { ctx.uniform1fv( loc, val ); };
+rqGL.prototype.UNIFORMTYPE_FLOAT2 = function( rqgl, ctx, loc, val ) { ctx.uniform2fv( loc, val ); };
+rqGL.prototype.UNIFORMTYPE_FLOAT3 = function( rqgl, ctx, loc, val ) { ctx.uniform3fv( loc, val ); };
+rqGL.prototype.UNIFORMTYPE_FLOAT4 = function( rqgl, ctx, loc, val ) { ctx.uniform4fv( loc, val ); };
+rqGL.prototype.UNIFORMTYPE_MATRIX33 = function( rqgl, ctx, loc, val ) { ctx.uniformMatrix3fv( loc, val ); };
+rqGL.prototype.UNIFORMTYPE_MATRIX44 = function( rqgl, ctx, loc, val ) { ctx.uniformMatrix4fv( loc, val ); };
+rqGL.prototype.UNIFORMTYPE_FLOAT1_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 1; ctx.uniform1f( loc+i, val[idx] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT2_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 2; ctx.uniform2f( loc+i, val[idx+0], val[idx+1] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT3_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 3; ctx.uniform3f( loc+i, val[idx+0], val[idx+1], val[idx+2] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT4_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 4; ctx.uniform4f( loc+i, val[idx+0], val[idx+1], val[idx+2], val[idx+3] ); } };
 //rqGL.prototype.UNIFORMTYPE_MATRIX33_ARRAY = function( ctx, loc, val, siz ) { ctx.uniformMatrix3fv( loc, val ); };
 //rqGL.prototype.UNIFORMTYPE_MATRIX44_ARRAY = function( ctx, loc, val, siz ) { ctx.uniformMatrix4fv( loc, val ); };
+rqGL.prototype.UNIFORMTYPE_TEXTURE = function( rqgl, ctx, loc, tex ) { var idx = rqgl.TextureIndex; ctx.activeTexture( ctx.TEXTURE0+idx ); ctx.bindTexture( ctx.TEXTURE_2D, tex ); ctx.uniform1i( loc, idx ); rqgl.TextureIndex++; };
 
 rqGL.prototype.PRIMITIVETYPE_TRIANGLES = 0;
 rqGL.prototype.PRIMITIVETYPE_TRIANGLE_STRIP = 1;
@@ -146,7 +156,7 @@ rqGL.prototype.ShaderProgram = function( vs, fs )
 
     this.Program = program;
     this.UniformInfo = {};
-}
+};
 
 // シェーダープログラム：作成
 rqGL.prototype.createShaderProgram = function( vs, fs )
@@ -159,13 +169,13 @@ rqGL.prototype.ShaderProgram.prototype.addUniform = function( name, type )
 {
     var loc = rqGL.GLContext.getUniformLocation( this.Program, name );
     this.UniformInfo[name] = {Location:loc,Func:type,Size:1};
-}
+};
 // シェーダープログラム：シェーダー定数(配列)追加
 rqGL.prototype.ShaderProgram.prototype.addUniformArray = function( name, type, size )
 {
     var loc = rqGL.GLContext.getUniformLocation( this.Program, name + "[0]" );
     this.UniformInfo[name] = {Location:loc,Func:type,Size:size};
-}
+};
 
 // バッチクラス
 rqGL.prototype.Batch = function( primitivetype, vb, ib, shader, inputlayout, vertexcount )
@@ -259,44 +269,86 @@ rqGL.prototype.Batch.prototype.precompute = function()
             break;
         }
 
-        this.NativeInputLayout.push( {Attribute:attr,Type:type,Normalized:normalized,Size:il[i].Size} );
+        this.NativeInputLayout.push( {Attribute:attr,Type:type,Normalized:normalized,Size:il[i].Size } );
         this.Stride += size * il[i].Size;
     }
-}
+};
 
-// バッチクラス：描画
-rqGL.prototype.Batch.prototype.draw = function()
+// バッチ描画
+rqGL.prototype.draw = function( batch )
 {
     var ctx = rqGL.GLContext;
-    ctx.bindBuffer( ctx.ARRAY_BUFFER, this.VertexBuffer );
-    ctx.bindBuffer( ctx.ELEMENT_ARRAY_BUFFER, this.IndexBuffer );
+    ctx.bindBuffer( ctx.ARRAY_BUFFER, batch.VertexBuffer );
+    ctx.bindBuffer( ctx.ELEMENT_ARRAY_BUFFER, batch.IndexBuffer );
 
-    ctx.useProgram( this.Shader.Program );
+    ctx.useProgram( batch.Shader.Program );
 
-    for( var i = 0; i < this.NativeInputLayout.length; ++i )
+    for( var i = 0; i < batch.NativeInputLayout.length; ++i )
     {
-        var nil = this.NativeInputLayout[i];
+        var nil = batch.NativeInputLayout[i];
         ctx.enableVertexAttribArray( nil.Attribute );
         ctx.vertexAttribPointer( nil.Attribute, nil.Size, nil.Type, nil.Normalized, this.Stride, 0 );
     }
 
-    for( key in this.Uniform )
+    this.TextureIndex = 0;
+    for( key in batch.Uniform )
     {
-        if( key in this.Shader.UniformInfo )
+        if( key in batch.Shader.UniformInfo )
         {
-            var ui = this.Shader.UniformInfo[key];
-            ui.Func( ctx, ui.Location, this.Uniform[key], ui.Size );
+            var ui = batch.Shader.UniformInfo[key];
+            ui.Func( this, ctx, ui.Location, batch.Uniform[key], ui.Size );
         }
     }
 
-    ctx.drawElements( this.NativePrimitiveType, this.VertexCount, ctx.UNSIGNED_SHORT, 0 );
+    ctx.drawElements( batch.NativePrimitiveType, batch.VertexCount, ctx.UNSIGNED_SHORT, 0 );
 
-    for( var i = 0; i < this.NativeInputLayout.length; ++i )
+    for( var i = 0; i < batch.NativeInputLayout.length; ++i )
     {
-        var nil = this.NativeInputLayout[i];
+        var nil = batch.NativeInputLayout[i];
         ctx.disableVertexAttribArray( nil.Attribute );
     }
-}
+};
+
+// フレームバッファクラス
+rqGL.prototype.FrameBuffer = function( width, height )
+{
+    var ctx = rqGL.GLContext;
+    this.FrameBuffer = ctx.createFramebuffer();
+    ctx.bindFramebuffer( ctx.FRAMEBUFFER, this.FrameBuffer );
+
+    this.Color = ctx.createTexture();
+    ctx.bindTexture( ctx.TEXTURE_2D, this.Color );
+    ctx.texImage2D( ctx.TEXTURE_2D, 0, ctx.RGBA, width, height, 0, ctx.RGBA, ctx.UNSIGNED_BYTE, null );
+    ctx.texParameteri( ctx.TEXTURE_2D, ctx.TEXTURE_MAG_FILTER, ctx.LINEAR );
+    ctx.texParameteri( ctx.TEXTURE_2D, ctx.TEXTURE_MIN_FILTER, ctx.LINEAR );
+    ctx.framebufferTexture2D( ctx.FRAMEBUFFER, ctx.COLOR_ATTACHMENT0, ctx.TEXTURE_2D, this.Color, 0 );
+    ctx.bindTexture( ctx.TEXTURE_2D, null );
+    this.Depth = ctx.createRenderbuffer();
+    ctx.bindRenderbuffer( ctx.RENDERBUFFER, this.Depth );
+    ctx.renderbufferStorage( ctx.RENDERBUFFER, ctx.DEPTH_COMPONENT16, width, height );
+    ctx.framebufferRenderbuffer( ctx.FRAMEBUFFER, ctx.DEPTH_ATTACHMENT, ctx.RENDERBUFFER, this.Depth );
+    ctx.bindRenderbuffer( ctx.RENDERBUFFER, null );
+    ctx.bindFramebuffer( ctx.FRAMEBUFFER, null );
+};
+
+// フレームバッファ作成
+rqGL.prototype.createFrameBuffer = function( width, height )
+{
+    return new rqGL.prototype.FrameBuffer( width, height );
+};
+
+rqGL.prototype.setFrameBuffer = function( fb )
+{
+    var ctx = rqGL.GLContext;
+    if( fb !== null )
+    {
+        ctx.bindFramebuffer( ctx.FRAMEBUFFER, fb.FrameBuffer );
+    }
+    else
+    {
+        ctx.bindFramebuffer( ctx.FRAMEBUFFER, null );
+    } 
+};
 
 // debug
 function debugprint( text )
