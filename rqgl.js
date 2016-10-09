@@ -287,7 +287,7 @@ rqGL.prototype.draw = function( batch )
     {
         var nil = batch.NativeInputLayout[i];
         ctx.enableVertexAttribArray( nil.Attribute );
-        ctx.vertexAttribPointer( nil.Attribute, nil.Size, nil.Type, nil.Normalized, this.Stride, 0 );
+        ctx.vertexAttribPointer( nil.Attribute, nil.Size, nil.Type, nil.Normalized, batch.Stride, 0 );
     }
 
     this.TextureIndex = 0;
