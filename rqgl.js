@@ -221,6 +221,7 @@ rqGL.prototype.Batch.prototype.precompute = function()
     var il = this.InputLayout.Layout;
 
     var counter = [];
+    var offset = 0;
     for( var i = 0; i < rqGL.prototype.ELEM_ENUM_MAX; ++i )
     {
         counter.push( 0 );
@@ -269,8 +270,9 @@ rqGL.prototype.Batch.prototype.precompute = function()
             break;
         }
 
-        this.NativeInputLayout.push( {Attribute:attr,Type:type,Normalized:normalized,Size:il[i].Size } );
+        this.NativeInputLayout.push( {Attribute:attr,Type:type,Normalized:normalized,Size:il[i].Size,Offset:offset } );
         this.Stride += size * il[i].Size;
+        offset += size * il[i].Size; // はいそこ、this.Strideでいいじゃんとかいわない。
     }
 };
 
@@ -287,7 +289,7 @@ rqGL.prototype.draw = function( batch )
     {
         var nil = batch.NativeInputLayout[i];
         ctx.enableVertexAttribArray( nil.Attribute );
-        ctx.vertexAttribPointer( nil.Attribute, nil.Size, nil.Type, nil.Normalized, batch.Stride, 0 );
+        ctx.vertexAttribPointer( nil.Attribute, nil.Size, nil.Type, nil.Normalized, batch.Stride, nil.Offset );
     }
 
     this.TextureIndex = 0;
