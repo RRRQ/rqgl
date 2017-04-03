@@ -110,10 +110,10 @@ rqGL.prototype.UNIFORMTYPE_FLOAT3 = function( rqgl, ctx, loc, val ) { ctx.unifor
 rqGL.prototype.UNIFORMTYPE_FLOAT4 = function( rqgl, ctx, loc, val ) { ctx.uniform4fv( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_MATRIX33 = function( rqgl, ctx, loc, val ) { ctx.uniformMatrix3fv( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_MATRIX44 = function( rqgl, ctx, loc, val ) { ctx.uniformMatrix4fv( loc, val ); };
-rqGL.prototype.UNIFORMTYPE_FLOAT1_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 1; ctx.uniform1f( loc+i, val[idx] ); } };
-rqGL.prototype.UNIFORMTYPE_FLOAT2_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 2; ctx.uniform2f( loc+i, val[idx+0], val[idx+1] ); } };
-rqGL.prototype.UNIFORMTYPE_FLOAT3_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 3; ctx.uniform3f( loc+i, val[idx+0], val[idx+1], val[idx+2] ); } };
-rqGL.prototype.UNIFORMTYPE_FLOAT4_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { var idx = i * 4; ctx.uniform4f( loc+i, val[idx+0], val[idx+1], val[idx+2], val[idx+3] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT1_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { ctx.uniform1fv( loc[i], val[i] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT2_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { ctx.uniform2fv( loc[i], val[i] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT3_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { ctx.uniform3fv( loc[i], val[i] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT4_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { ctx.uniform4fv( loc[i], val[i] ); } };
 //rqGL.prototype.UNIFORMTYPE_MATRIX33_ARRAY = function( ctx, loc, val, siz ) { ctx.uniformMatrix3fv( loc, val ); };
 //rqGL.prototype.UNIFORMTYPE_MATRIX44_ARRAY = function( ctx, loc, val, siz ) { ctx.uniformMatrix4fv( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_TEXTURE = function( rqgl, ctx, loc, tex ) { var idx = rqgl.TextureIndex; ctx.activeTexture( ctx.TEXTURE0+idx ); ctx.bindTexture( ctx.TEXTURE_2D, tex ); ctx.uniform1i( loc, idx ); rqgl.TextureIndex++; };
@@ -165,16 +165,25 @@ rqGL.prototype.createShaderProgram = function( vs, fs )
 };
 
 // シェーダープログラム：シェーダー定数追加
-rqGL.prototype.ShaderProgram.prototype.addUniform = function( name, type )
+rqGL.prototype.ShaderProgram.prototype.addUniform = function( name, type, size )
 {
-    var loc = rqGL.GLContext.getUniformLocation( this.Program, name );
-    this.UniformInfo[name] = {Location:loc,Func:type,Size:1};
-};
-// シェーダープログラム：シェーダー定数(配列)追加
-rqGL.prototype.ShaderProgram.prototype.addUniformArray = function( name, type, size )
-{
-    var loc = rqGL.GLContext.getUniformLocation( this.Program, name + "[0]" );
-    this.UniformInfo[name] = {Location:loc,Func:type,Size:size};
+    if( size === undefined )
+    {
+        var loc = rqGL.GLContext.getUniformLocation( this.Program, name );
+        this.UniformInfo[name] = {Location:loc,Func:type,Size:1};
+    }
+    else
+    {
+        this.UniformInfo[name] = {};
+        this.UniformInfo[name].Location = new Array( size );
+        for( var i = 0; i < size; ++i )
+        {
+            var loc = rqGL.GLContext.getUniformLocation( this.Program, name + "[" + i + "]" );
+            this.UniformInfo[name].Location[i] = loc;
+        }
+        this.UniformInfo[name].Func = type;
+        this.UniformInfo[name].Size = size;
+    }
 };
 
 // バッチクラス
