@@ -104,13 +104,13 @@ rqGL.prototype.TYPE_FLOAT    = 0;
 rqGL.prototype.TYPE_UINT_N   = 1;
 rqGL.prototype.TYPE_USHORT_N = 2;
 
-rqGL.prototype.UNIFORMTYPE_FLOAT1 = function( rqgl, ctx, loc, val ) { ctx.uniform1fv( loc, val ); };
+rqGL.prototype.UNIFORMTYPE_FLOAT1 = function( rqgl, ctx, loc, val ) { ctx.uniform1f( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_FLOAT2 = function( rqgl, ctx, loc, val ) { ctx.uniform2fv( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_FLOAT3 = function( rqgl, ctx, loc, val ) { ctx.uniform3fv( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_FLOAT4 = function( rqgl, ctx, loc, val ) { ctx.uniform4fv( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_MATRIX33 = function( rqgl, ctx, loc, val ) { ctx.uniformMatrix3fv( loc, val ); };
 rqGL.prototype.UNIFORMTYPE_MATRIX44 = function( rqgl, ctx, loc, val ) { ctx.uniformMatrix4fv( loc, val ); };
-rqGL.prototype.UNIFORMTYPE_FLOAT1_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { ctx.uniform1fv( loc[i], val[i] ); } };
+rqGL.prototype.UNIFORMTYPE_FLOAT1_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { ctx.uniform1f( loc[i], val[i] ); } };
 rqGL.prototype.UNIFORMTYPE_FLOAT2_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { ctx.uniform2fv( loc[i], val[i] ); } };
 rqGL.prototype.UNIFORMTYPE_FLOAT3_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { ctx.uniform3fv( loc[i], val[i] ); } };
 rqGL.prototype.UNIFORMTYPE_FLOAT4_ARRAY = function( rqgl, ctx, loc, val, siz ) { for( var i = 0; i < siz; ++i ) { ctx.uniform4fv( loc[i], val[i] ); } };
