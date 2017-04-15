@@ -4,7 +4,7 @@ function rqGL( canvasid )
     var ctx = null;
 
     var canvas = document.getElementById( canvasid );
-    ctx = canvas.getContext( "webgl" );
+    ctx = canvas.getContext( "webgl" ) || canvas.getContext( "experimental-webgl" );
 
     rqGL.GLContext = ctx;
     
@@ -15,7 +15,8 @@ function rqGL( canvasid )
 rqGL.prototype.clear = function()
 {
     rqGL.GLContext.clearColor( this.ClearColor[0], this.ClearColor[1], this.ClearColor[2], this.ClearColor[3]);
-    rqGL.GLContext.clear( rqGL.GLContext.COLOR_BUFFER_BIT );
+    rqGL.GLContext.clearDepth( 1.0 );
+    rqGL.GLContext.clear( rqGL.GLContext.COLOR_BUFFER_BIT | rqGL.GLContext.DEPTH_BUFFER_BIT );
 };
 rqGL.prototype.setClearColor = function( r,g,b,a )
 {
